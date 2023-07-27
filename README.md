@@ -1,6 +1,12 @@
 ### Code for Paper: “Low-Resource” Text Classification: A Parameter-Free Classification Method with Compressors
 
-This paper is accepted to Findings of [ACL2023](https://aclanthology.org/2023.findings-acl.426/).
+**This fork adds a simple baseline based on token matching to the repository**
+**It can be enabled with the flag `--simple'**
+**Try it:**
+
+```
+python main_text.py --simple
+```
 
 ### Require
 
