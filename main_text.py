@@ -32,10 +32,11 @@ def non_neural_knn_exp(
     dis_func: Callable,
     k: int,
     para: bool = True,
+    simple: bool = False,
 ):
-    print("KNN with compressor={}".format(compressor_name))
+    print("KNN with compressor={}; overwritten by simple: {}".format(compressor_name, args.simple))
     cp = DefaultCompressor(compressor_name)
-    knn_exp_ins = KnnExpText(agg_func, cp, dis_func)
+    knn_exp_ins = KnnExpText(agg_func, cp, dis_func, simple=simple)
     start = time.time()
     if para:
         with Pool(5) as p:
@@ -83,14 +84,14 @@ def record_distance(
         del distance_for_selected_test
     else:
         knn_exp.calc_dis(test_data, train_data=train_data)
-        np.save(out_fn, np.array(knn_exp.distance_matrix))
+        np.save(out_fn, np.array(knn_exp.dis_matrix))
     print("spent: {}".format(time.time() - start))
 
 
 def non_neurl_knn_exp_given_dis(dis_matrix, k, test_label, train_label):
     knn_exp = KnnExpText(None, None, None)
     _, correct = knn_exp.calc_acc(
-        k, test_label, train_label=train_label, provided_distance_matrix=dis_matrix, rand=args.random
+        k, test_label, train_label=train_label, provided_distance_matrix=dis_matrix
     )
     return correct
 
@@ -105,6 +106,7 @@ if __name__ == "__main__":
     parser.add_argument("--all_test", action="store_true", default=False)
     parser.add_argument("--all_train", action="store_true", default=False)
     parser.add_argument("--para", action="store_true", default=False)
+    parser.add_argument("--simple", action="store_true", default=False)
     parser.add_argument(
         "--record",
         action="store_true",
@@ -119,7 +121,6 @@ if __name__ == "__main__":
     parser.add_argument("--score", action="store_true", default=False)
     parser.add_argument("--k", default=2, type=int)
     parser.add_argument("--class_num", default=5, type=int)
-    parser.add_argument("--random", action="store_true", default=False)
     args = parser.parse_args()
     # create output dir
     if not os.path.exists(args.output_dir):
@@ -184,7 +185,7 @@ if __name__ == "__main__":
         elif args.dataset == "swahili":
             dataset_pair = load_swahili()
         elif args.dataset == "filipino":
-            dataset_pair = load_filipino(args.data_dir)
+            dataset_pair = load_filipino()
         else:
             dataset_pair = load_custom_dataset(args.data_dir)
     num_classes = ds2classes[args.dataset]
@@ -237,6 +238,7 @@ if __name__ == "__main__":
             NCD,
             args.k,
             para=args.para,
+            simple = args.simple
         )
     else:
         if not args.score:
@@ -288,4 +290,4 @@ if __name__ == "__main__":
                 print("Altogether Accuracy is: {}".format(all_correct / total_num))
             else:
                 dis_matrix = np.load(args.distance_fn)
-                non_neurl_knn_exp_given_dis(dis_matrix, args.k, test_labels, train_labels)
+                non_neurl_knn_exp_given_dis(dis_matrix, 3, test_labels, train_labels)
