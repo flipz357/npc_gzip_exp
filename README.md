@@ -1,12 +1,16 @@
-### Code for Paper: “Low-Resource” Text Classification: A Parameter-Free Classification Method with Compressors
+### Introductory note to this fork
 
-**This fork adds a simple baseline based on token matching to the repository**
-**It can be enabled with the flag `--simple'**
+This fork adds a simple baseline based on token matching to the repository
+
 **Try it:**
 
 ```
 python main_text.py --simple
 ```
+
+What follows is from the original repo:
+
+### Code for Paper: “Low-Resource” Text Classification: A Parameter-Free Classification Method with Compressors
 
 ### Require
 
