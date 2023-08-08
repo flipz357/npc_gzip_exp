@@ -21,12 +21,12 @@ from compressors import DefaultCompressor
 from normalize import string2set
 
 class KnnExpText:
-    def __init__(self, aggregation_function: Callable, compressor: DefaultCompressor, distance_function: Callable, simple: bool = False):
+    def __init__(self, aggregation_function: Callable, compressor: DefaultCompressor, distance_function: Callable, bow_knn: bool = False):
         self.aggregation_func = aggregation_function
         self.compressor = compressor
         self.distance_func = distance_function
         self.distance_matrix = []
-        self.simple = simple
+        self.bow_knn = bow_knn
 
     def calc_dis(self, data: list, train_data: list = None, fast: bool = False) -> None:
         """
@@ -48,7 +48,7 @@ class KnnExpText:
         
         for i, t1 in tqdm(enumerate(data)):
             distance4i = []
-            if not self.simple:
+            if not self.bow_knn:
                 if fast:
                     t1_compressed = self.compressor.get_compressed_len_fast(t1)
                 else:

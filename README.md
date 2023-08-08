@@ -1,14 +1,28 @@
 ### Introductory note to this fork
 
-This fork adds a simple baseline based on token matching to the repository
+This fork adds simple baselines based on *bag-of-word* to the repository
 
 **Try it:**
 
+Calling the original KNN with original gzip distance:
+
 ```
-python main_text.py --simple
+python main_text.py
 ```
 
-What follows is from the original repo:
+Calling the KNN with bag-of-words distance:
+
+```
+python main_text.py --bow_knn
+```
+
+Calling a bag-of-words classifier:
+
+```
+python main_text.py --bow_trained
+```
+
+What follows is from the original repo. All options of the original repo should still be possible.
 
 ### Code for Paper: “Low-Resource” Text Classification: A Parameter-Free Classification Method with Compressors
 

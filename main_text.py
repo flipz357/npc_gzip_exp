@@ -32,11 +32,11 @@ def non_neural_knn_exp(
     dis_func: Callable,
     k: int,
     para: bool = True,
-    simple: bool = False,
+    bow_knn: bool = False,
 ):
-    print("KNN with compressor={}; overwritten by simple: {}".format(compressor_name, args.simple))
+    print("KNN with compressor={}; overwritten by simple: {}".format(compressor_name, args.bow_knn))
     cp = DefaultCompressor(compressor_name)
-    knn_exp_ins = KnnExpText(agg_func, cp, dis_func, simple=simple)
+    knn_exp_ins = KnnExpText(agg_func, cp, dis_func, bow_knn=bow_knn)
     start = time.time()
     if para:
         with Pool(5) as p:
@@ -106,7 +106,8 @@ if __name__ == "__main__":
     parser.add_argument("--all_test", action="store_true", default=False)
     parser.add_argument("--all_train", action="store_true", default=False)
     parser.add_argument("--para", action="store_true", default=False)
-    parser.add_argument("--simple", action="store_true", default=False)
+    parser.add_argument("--bow_knn", action="store_true", default=False)
+    parser.add_argument("--bow_trained", action="store_true", default=False)
     parser.add_argument(
         "--record",
         action="store_true",
@@ -227,6 +228,22 @@ if __name__ == "__main__":
         train_data, train_labels = read_torch_text_labels(
             train_pair, range(len(train_pair))
         )
+
+    if args.bow_trained:
+        from sklearn.metrics import accuracy_score
+        from sklearn.svm import LinearSVC
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        import sys
+
+        clff = LinearSVC()
+        cvv = TfidfVectorizer(lowercase=True)
+        trainx = cvv.fit_transform(train_data)
+        testx = cvv.transform(test_data)
+        clff.fit(trainx, train_labels)
+        testybar = clff.predict(testx)
+        print("tfidf clf accuracy", accuracy_score(test_labels, testybar))
+        sys.exit(0)
+
     if not args.record:
         non_neural_knn_exp(
             args.compressor,
@@ -238,7 +255,7 @@ if __name__ == "__main__":
             NCD,
             args.k,
             para=args.para,
-            simple = args.simple
+            bow_knn = args.bow_knn
         )
     else:
         if not args.score:
